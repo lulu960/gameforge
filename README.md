@@ -1,3 +1,4 @@
+
 # GameForge — Plateforme Django IA
 
 GameForge est une plateforme web Django permettant de générer des concepts de jeux vidéo avec l'aide de l'IA (Hugging Face, Diffusers, Transformers, etc.).
@@ -14,6 +15,7 @@ python -m venv .venv
 pip install -r requirements.txt
 
 # 3) Appliquer les migrations
+python manage.py makemigrations
 python manage.py migrate
 
 # 4) (Optionnel) Créer un superuser pour l'admin
@@ -21,7 +23,6 @@ python manage.py createsuperuser
 
 # 5) Lancer le serveur
 python manage.py runserver
-```
 
 Accédez à http://127.0.0.1:8000/
 
@@ -30,15 +31,18 @@ Accédez à http://127.0.0.1:8000/
 - Création guidée de jeux vidéo avec formulaire
 - Génération IA : univers, scénario (3 actes), lieux, personnages, images conceptuelles
 - Exploration libre : génération aléatoire, sauvegarde si connecté
-- Tableau de bord personnel, page de détail, favoris
+- Tableau de bord personnel avec recherche, filtrage, et gestion des favoris (Star)
+- Système de Star (favoris) sur chaque jeu, style GitHub
+- Affichage du nombre de stars sur chaque jeu (dashboard et jeux publics)
 - Toggle Public/Privé pour chaque jeu
 - UI moderne avec Tailwind CSS
 - Limite quotidienne de génération par utilisateur (modifiable via `GAMEFORGE_DAILY_LIMIT`)
+- Page de paramètres du compte (modification email, username)
 
 ## 🎮 Modèle de données
 - **Game** : titre, genre (30+ genres), ambiance, mots-clés, références, univers, histoire, lieux, images conceptuelles, visibilité
 - **Character** : nom, rôle, capacités, motivation
-- **Favorite** : favoris utilisateur
+- **Favorite** : favoris utilisateur (Star)
 
 ## 🤖 Génération IA
 - Utilise Hugging Face InferenceClient pour générer le texte et les images (Stable Diffusion, CLIP, etc.)
@@ -55,7 +59,6 @@ Accédez à http://127.0.0.1:8000/
 - diffusers, transformers, huggingface_hub
 
 ## 🖼️ Images conceptuelles
-- Par défaut : placeholders via Picsum
 - Pour la production : configurez Hugging Face / Stable Diffusion
 
 ## 🔒 Authentification & Limites
@@ -66,7 +69,9 @@ Accédez à http://127.0.0.1:8000/
 - Créez un compte
 - Explorez ou créez un jeu via le formulaire
 - Visualisez le scénario, les personnages, les images générées
-- Ajoutez aux favoris, basculez la visibilité
+- Ajoutez des stars (favoris) directement depuis le dashboard
+- Filtrez et recherchez vos jeux
+- Modifiez vos infos de compte
 
 ## 📄 Licence
 Projet pédagogique — libre d'utilisation et de modification.
