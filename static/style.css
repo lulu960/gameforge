@@ -1,7 +1,21 @@
+/* Spinner loader animation */
+.loader {
+  border-top-color: #38a169;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 /* You can put small custom CSS here if needed. Tailwind handles most styling. */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: #000;
 }
+
+
+
+

@@ -1,48 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="text-3xl font-bold mb-4">Exploration libre</h1>
-<form method="post" class="grid lg:grid-cols-3 gap-6">
-  {% csrf_token %}
-  <div class="lg:col-span-2 space-y-4">
-    <div class="rounded border border-white/10 bg-gray-900/60 overflow-hidden">
-      {% if preview.environment_image_url %}
-        <img src="{{ preview.environment_image_url }}" class="w-full h-56 object-cover" alt="env">
-      {% endif %}
-      <div class="p-4 space-y-2">
-        <h2 class="text-2xl font-semibold">{{ preview.title }}</h2>
-        <p class="text-sm text-gray-400">Genre: {{ preview.genre }} • {{ preview.ambiance }}</p>
-        <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.universe }}</pre>
-        <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.locations }}</pre>
-        <h3 class="text-xl font-semibold mt-3">Scénario</h3>
-        <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.story }}</pre>
-      </div>
-    </div>
 
-    <div class="rounded border border-white/10 bg-gray-900/60 p-4">
-      <h3 class="text-xl font-semibold mb-2">Personnages</h3>
-      <div class="grid md:grid-cols-2 gap-3">
-        {% for ch in preview.characters %}
-        <div class="border border-white/10 rounded p-3 bg-gray-900/60">
-          <div class="font-semibold">{{ ch.name }}</div>
-          <div class="text-xs text-gray-400 mb-1">{{ ch.role }}</div>
-          <p class="text-sm">{{ ch.abilities }}</p>
-          <p class="text-sm text-gray-300">{{ ch.motivation }}</p>
+<div id="explore-container">
+  {% if not preview %}
+    <form id="generate-form" method="post">
+      {% csrf_token %}
+  <button id="generate-btn" type="submit" class="w-full px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Générer un jeu aléatoire</button>
+    </form>
+    <div id="loading-bar" style="display:none;" class="mt-4 flex justify-center">
+      <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-12 w-12"></div>
+      <span class="ml-3 text-gray-400">Génération en cours...</span>
+    </div>
+  <!-- Le style du spinner est maintenant dans static/style.css -->
+    <script>
+      document.getElementById('generate-form').addEventListener('submit', function(e) {
+        document.getElementById('loading-bar').style.display = 'flex';
+        var btn = document.getElementById('generate-btn');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      });
+    </script>
+  {% else %}
+    <form method="post">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="rounded border border-white/10 bg-gray-900/60 overflow-hidden">
+            {% if preview.environment_image_url %}
+              <img src="{{ preview.environment_image_url }}" class="w-full h-56 object-cover" alt="env">
+            {% endif %}
+            <div class="p-4 space-y-2">
+              <h1 class="text-3xl font-bold">{{ preview.title }}</h1>
+              <p class="text-sm text-gray-400">Genre: {{ preview.genre }} • {{ preview.ambiance }}</p>
+              <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.universe }}</pre>
+              <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.locations }}</pre>
+              <h2 class="text-xl font-semibold mt-3">Scénario</h2>
+              <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.story }}</pre>
+            </div>
+          </div>
+
+          <div class="rounded border border-white/10 bg-gray-900/60 p-4">
+            <h2 class="text-xl font-semibold mb-2">Personnages</h2>
+            <div class="grid md:grid-cols-2 gap-3">
+              {% for ch in preview.characters %}
+              <div class="border border-white/10 rounded p-3 bg-gray-900/60">
+                <div class="font-semibold">{{ ch.name }}</div>
+                <div class="text-xs text-gray-400 mb-1">{{ ch.role }}</div>
+                <p class="text-sm">{{ ch.abilities }}</p>
+                <p class="text-sm text-gray-300">{{ ch.motivation }}</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
 
-  <aside class="space-y-4">
-    {% if user.is_authenticated %}
-      <button class="w-full px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Enregistrer dans mon tableau de bord</button>
-    {% else %}
-      <p class="text-sm text-gray-400">Connectez-vous pour sauvegarder cet aperçu.</p>
-      <a href="/accounts/login/" class="block text-center px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 mt-2">Se connecter</a>
-    {% endif %}
-    {% if preview.character_image_url %}
-      <img src="{{ preview.character_image_url }}" class="w-full h-56 object-cover rounded border border-white/10" alt="char">
-    {% endif %}
-  </aside>
-</form>
+        <aside class="space-y-4">
+          <div class="rounded border border-white/10 bg-gray-900/60 overflow-hidden">
+            {% if preview.character_image_url %}
+              <img src="{{ preview.character_image_url }}" class="w-full h-56 object-cover" alt="character">
+            {% endif %}
+            <div class="p-4 space-y-3">
+              {% if user.is_authenticated %}
+                <button name="save" value="1" class="w-full px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600 mb-2">Enregistrer dans mon tableau de bord</button>
+              {% else %}
+                <p class="text-sm text-gray-400">Connectez-vous pour sauvegarder cet aperçu.</p>
+                <a href="/accounts/login/" class="block text-center px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 mt-2">Se connecter</a>
+              {% endif %}
+              <button id="delete-btn" name="delete" value="1" class="w-full px-3 py-2 rounded bg-red-700 hover:bg-red-600 mt-2">Supprimer</button>
+              <button id="regen-btn" name="regen" value="1" type="submit" class="w-full px-3 py-2 rounded bg-indigo-700 hover:bg-indigo-600 mt-2">Régénérer</button>
+            </div>
+            <div id="regen-loading-bar" style="display:none;" class="mt-4 flex justify-center">
+              <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-12 w-12"></div>
+              <span class="ml-3 text-gray-400">Génération en cours...</span>
+            </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      {% csrf_token %}
+      <script>
+        document.getElementById('regen-btn').addEventListener('click', function() {
+          document.getElementById('regen-loading-bar').style.display = 'flex';
+          setTimeout(function() {
+            document.getElementById('regen-btn').disabled = true;
+            document.getElementById('regen-btn').classList.add('opacity-50', 'cursor-not-allowed');
+            var saveBtn = document.querySelector('button[name="save"]');
+            if (saveBtn) {
+              saveBtn.disabled = true;
+              saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            var deleteBtn = document.getElementById('delete-btn');
+            if (deleteBtn) {
+              deleteBtn.disabled = true;
+              deleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+          }, 50); // délai court pour laisser le navigateur soumettre le formulaire
+        });
+      </script>
+    </form>
+  {% endif %}
+</div>
+
+
+
 {% endblock %}

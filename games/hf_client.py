@@ -30,14 +30,15 @@ def _get_image_client() -> InferenceClient:
 
 SYSTEM_INSTRUCTION = "You are GameForge, an assistant that creates concise, structured game design content in French."
 
-def chat_completion(prompt: str, max_tokens: int = 600) -> str:
+def chat_completion(prompt: str, max_tokens: int = 2000) -> str:
     client = _get_text_client()
     print(f"[HF LOG] chat_completion called with prompt: {prompt}")
+    messages = [
+        {"role": "system", "content": SYSTEM_INSTRUCTION},
+        {"role": "user", "content": prompt},
+    ]
     try:
-        messages = [
-            {"role": "system", "content": SYSTEM_INSTRUCTION},
-            {"role": "user", "content": prompt},
-        ]
+        # Utilisation de conversational uniquement
         resp = client.chat.completions.create(
             model=HF_TEXT_MODEL,
             messages=messages,
@@ -47,19 +48,9 @@ def chat_completion(prompt: str, max_tokens: int = 600) -> str:
         result = resp.choices[0].message.content.strip()
         print(f"[HF LOG] chat_completion result: {result}")
         return result
-    except Exception:
-        print(f"[HF LOG] chat_completion failed, fallback to text_generation.")
-        try:
-            gen = client.text_generation(
-                f"{SYSTEM_INSTRUCTION}\nUtilisateur: {prompt}\nAssistant:",
-                max_new_tokens=max_tokens,
-                temperature=0.7,
-            )
-            print(f"[HF LOG] text_generation result: {gen.strip()}")
-            return gen.strip()
-        except Exception as e:
-            print(f"[HF LOG] Hugging Face error: {e}")
-            return f"[Erreur Hugging Face] {e}"
+    except Exception as e:
+        print(f"[HF LOG] Hugging Face error: {e}")
+        return f"[Erreur Hugging Face] {e}"
 
 def txt2img(prompt: str, width: int = 768, height: int = 512) -> bytes:
     print(f"[HF LOG] txt2img called with prompt: {prompt}, size: {width}x{height}")
