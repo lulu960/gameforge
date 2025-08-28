@@ -1,18 +1,31 @@
-# Backend web
+
+# GameForge — requirements.txt
+# Backend & IA
+
+# Django web framework
 Django==5.0.6
+
+# Utilitaires
 requests>=2.32.3
 python-dotenv>=1.0.1
-
-# Images
 Pillow>=10.4.0
 
-# PyTorch (GPU build CUDA 12.4)
+# IA & génération d'images
+diffusers>=0.31.0
+transformers>=4.44.2
+huggingface_hub>=0.24.6
+
+# PyTorch (GPU CUDA 12.4 recommandé)
 torch==2.4.0+cu124
 torchvision==0.19.0+cu124
 torchaudio==2.4.0+cu124
 --extra-index-url https://download.pytorch.org/whl/cu124
 
-# HuggingFace / Diffusion
-diffusers>=0.31.0
-transformers>=4.44.2
-huggingface_hub>=0.24.6
+# Pour CPU uniquement (remplacez les versions ci-dessus si besoin)
+# torch==2.4.0
+# torchvision==0.19.0
+# torchaudio==2.4.0
+
+# Autres dépendances utiles
+# tqdm
+# rich
