@@ -53,13 +53,39 @@ from .forms import GameForm
 from .ai import generate_all, generate_all as ai_generate_all
 
 def home_view(request):
-    games = Game.objects.filter(is_public=True).order_by('-created_at')
-    return render(request, 'games/home.html', {'games': games})
+    games = Game.objects.filter(is_public=True)
+    q = request.GET.get('q', '').strip()
+    genre = request.GET.get('genre', '').strip()
+    date = request.GET.get('date', '').strip()
+    if q:
+        games = games.filter(title__icontains=q)
+    if genre:
+        games = games.filter(genre=genre)
+    if date:
+        games = games.filter(created_at__date=date)
+    games = games.order_by('-created_at')
+    return render(request, 'games/home.html', {'games': games, 'request': request})
 
 @login_required
 def dashboard_view(request):
-    games = Game.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'games/dashboard.html', {'games': games})
+    games = Game.objects.filter(user=request.user)
+    q = request.GET.get('q', '').strip()
+    genre = request.GET.get('genre', '').strip()
+    date = request.GET.get('date', '').strip()
+    if q:
+        games = games.filter(title__icontains=q)
+    if genre:
+        games = games.filter(genre=genre)
+    if date:
+        games = games.filter(created_at__date=date)
+    games = games.order_by('-created_at').prefetch_related('favorited_by')
+
+    # Annoter chaque jeu avec is_liked pour l'utilisateur courant
+    games_list = []
+    for game in games:
+        is_liked = game.favorited_by.filter(user=request.user).exists()
+        games_list.append({'game': game, 'is_liked': is_liked})
+    return render(request, 'games/dashboard.html', {'games_list': games_list, 'request': request})
 
 def _under_daily_limit(user):
     today = timezone.now().date()
@@ -115,14 +141,14 @@ def add_favorite_view(request, pk):
     game = get_object_or_404(Game, pk=pk)
     Favorite.objects.get_or_create(user=request.user, game=game)
     messages.success(request, "Ajouté aux favoris ⭐")
-    return redirect('games:detail', pk=pk)
+    return redirect('games:dashboard')
 
 @login_required
 def remove_favorite_view(request, pk):
     game = get_object_or_404(Game, pk=pk)
     Favorite.objects.filter(user=request.user, game=game).delete()
     messages.info(request, "Retiré des favoris.")
-    return redirect('games:detail', pk=pk)
+    return redirect('games:dashboard')
 
 @login_required
 def favorites_view(request):

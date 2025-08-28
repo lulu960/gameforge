@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block content %}
 <div class="flex items-center justify-between mb-4">
@@ -7,8 +8,24 @@
     <a href="{% url 'games:explore' %}" class="px-3 py-2 rounded bg-indigo-700 hover:bg-indigo-600">Explorer</a>
   </div>
 </div>
+
+<form method="get" class="mb-6 flex flex-wrap gap-2 items-center">
+  <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Rechercher par titre..." class="px-3 py-2 rounded bg-gray-800 text-white" />
+  <select name="genre" class="px-3 py-2 rounded bg-gray-800 text-white">
+    <option value="">Genre</option>
+    {% if games_list and games_list.0 %}
+      {% for key, val in games_list.0.game.GENRES %}
+        <option value="{{ key }}" {% if request.GET.genre == key %}selected{% endif %}>{{ val }}</option>
+      {% endfor %}
+    {% endif %}
+  </select>
+  <input type="date" name="date" value="{{ request.GET.date }}" class="px-3 py-2 rounded bg-gray-800 text-white" />
+  <button type="submit" class="px-3 py-2 rounded bg-blue-700 hover:bg-blue-600">Filtrer</button>
+</form>
+
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-  {% for game in games %}
+  {% for item in games_list %}
+    {% with game=item.game is_liked=item.is_liked %}
     <div class="rounded-lg overflow-hidden border border-white/10 bg-gray-900/50">
       {% if game.environment_image_url %}
         <img src="{{ game.environment_image_url }}" class="w-full h-40 object-cover" alt="env">
@@ -19,12 +36,32 @@
           <span class="text-xs px-2 py-0.5 rounded bg-white/10">{{ game.get_genre_display }}</span>
         </div>
         <p class="text-xs text-gray-400">Visibilité: <span class="font-mono">{{ game.is_public|yesno:"Public,Privé" }}</span></p>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="inline-flex items-center px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 text-xs font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z"/></svg>
+            {{ game.favorited_by.count }}
+          </span>
+        </div>
         <div class="flex gap-2">
           <a href="{% url 'games:detail' game.id %}" class="px-2 py-1 text-sm rounded bg-gray-800 hover:bg-gray-700">Ouvrir</a>
           <a href="{% url 'games:toggle_privacy' game.id %}" class="px-2 py-1 text-sm rounded bg-gray-800 hover:bg-gray-700">Toggle Public/Privé</a>
+          {% if user.is_authenticated %}
+            {% if is_liked %}
+              <a href="{% url 'games:unfavorite' game.id %}" class="px-2 py-1 text-sm rounded bg-yellow-700 hover:bg-yellow-600 inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z"/></svg>
+                Retirer Star
+              </a>
+            {% else %}
+              <a href="{% url 'games:favorite' game.id %}" class="px-2 py-1 text-sm rounded bg-yellow-700 hover:bg-yellow-600 inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z"/></svg>
+                Star
+              </a>
+            {% endif %}
+          {% endif %}
         </div>
       </div>
     </div>
+    {% endwith %}
   {% empty %}
     <p>Pas encore de jeu. Lancez-vous !</p>
   {% endfor %}

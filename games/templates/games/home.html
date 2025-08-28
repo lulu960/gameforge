@@ -1,6 +1,22 @@
+
 {% extends "base.html" %}
 {% block content %}
 <h1 class="text-3xl font-bold mb-4">Jeux publics</h1>
+
+<form method="get" class="mb-6 flex flex-wrap gap-2 items-center">
+  <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Rechercher par titre..." class="px-3 py-2 rounded bg-gray-800 text-white" />
+  <select name="genre" class="px-3 py-2 rounded bg-gray-800 text-white">
+    <option value="">Genre</option>
+    {% if games and games.0 %}
+      {% for key, val in games.0.GENRES %}
+        <option value="{{ key }}" {% if request.GET.genre == key %}selected{% endif %}>{{ val }}</option>
+      {% endfor %}
+    {% endif %}
+  </select>
+  <input type="date" name="date" value="{{ request.GET.date }}" class="px-3 py-2 rounded bg-gray-800 text-white" />
+  <button type="submit" class="px-3 py-2 rounded bg-blue-700 hover:bg-blue-600">Filtrer</button>
+</form>
+
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
   {% for game in games %}
     <a href="{% url 'games:detail' game.id %}" class="block rounded-lg overflow-hidden border border-white/10 bg-gray-900/50 hover:bg-gray-900/70">
@@ -13,6 +29,12 @@
           <span class="text-xs px-2 py-0.5 rounded bg-white/10">{{ game.get_genre_display }}</span>
         </div>
         <p class="text-sm text-gray-400 line-clamp-2">{{ game.ambiance }}</p>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="inline-flex items-center px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 text-xs font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.049 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z"/></svg>
+            {{ game.favorited_by.count }}
+          </span>
+        </div>
         <p class="text-xs text-gray-500 mt-2">par {{ game.user.username }} • {{ game.created_at|date:"d/m/Y H:i" }}</p>
       </div>
     </a>
