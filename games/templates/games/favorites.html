@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Mes favoris</h1>
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+  {% for fav in favorites %}
+    <a href="{% url 'games:detail' fav.game.id %}" class="block rounded-lg overflow-hidden border border-white/10 bg-gray-900/50 hover:bg-gray-900/70">
+      {% if fav.game.environment_image_url %}
+        <img src="{{ fav.game.environment_image_url }}" class="w-full h-40 object-cover" alt="env">
+      {% endif %}
+      <div class="p-3">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="font-semibold">{{ fav.game.title }}</h3>
+          <span class="text-xs px-2 py-0.5 rounded bg-white/10">{{ fav.game.get_genre_display }}</span>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">par {{ fav.game.user.username }} • {{ fav.created_at|date:"d/m/Y H:i" }}</p>
+      </div>
+    </a>
+  {% empty %}
+    <p>Aucun favori pour l’instant.</p>
+  {% endfor %}
+</div>
+{% endblock %}

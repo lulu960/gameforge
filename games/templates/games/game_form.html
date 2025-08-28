@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Créer un jeu</h1>
+<form method="post" class="space-y-4 bg-gray-900/60 border border-white/10 p-4 rounded">
+  {% csrf_token %}
+  <div class="grid md:grid-cols-2 gap-4">
+    <div>
+      <label class="block mb-1">Titre</label>
+      {{ form.title }}
+    </div>
+    <div>
+      <label class="block mb-1">Genre</label>
+      {{ form.genre }}
+    </div>
+  </div>
+  <div>
+    <label class="block mb-1">Ambiance</label>
+    {{ form.ambiance }}
+  </div>
+  <div>
+    <label class="block mb-1">Mots-clés</label>
+    {{ form.keywords }}
+  </div>
+  <div>
+    <label class="block mb-1">Références (facultatif)</label>
+    {{ form.references }}
+  </div>
+  <div class="flex items-center gap-2">
+    {{ form.is_public }} <label>Rendre public</label>
+  </div>
+  <button class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Générer avec l'IA (placeholder)</button>
+</form>
+{% endblock %}

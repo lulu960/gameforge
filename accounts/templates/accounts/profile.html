@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-gray-900/60 border border-white/10 p-6 rounded">
+  <h1 class="text-2xl font-semibold mb-1">Profil</h1>
+  <p class="text-gray-400 mb-4">Connecté en tant que <span class="font-mono">{{ user.username }}</span></p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <a href="/games/dashboard/" class="p-3 rounded bg-gray-800/80 hover:bg-gray-800 border border-white/10">Aller au tableau de bord</a>
+    <a href="/games/create/" class="p-3 rounded bg-emerald-700 hover:bg-emerald-600">Créer un nouveau jeu</a>
+  </div>
+</div>
+{% endblock %}

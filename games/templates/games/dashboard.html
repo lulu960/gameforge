@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-3xl font-bold">Mon tableau de bord</h1>
+  <div class="flex gap-2">
+    <a href="{% url 'games:create' %}" class="px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Nouveau jeu</a>
+    <a href="{% url 'games:explore' %}" class="px-3 py-2 rounded bg-indigo-700 hover:bg-indigo-600">Explorer</a>
+  </div>
+</div>
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+  {% for game in games %}
+    <div class="rounded-lg overflow-hidden border border-white/10 bg-gray-900/50">
+      {% if game.environment_image_url %}
+        <img src="{{ game.environment_image_url }}" class="w-full h-40 object-cover" alt="env">
+      {% endif %}
+      <div class="p-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold">{{ game.title }}</h3>
+          <span class="text-xs px-2 py-0.5 rounded bg-white/10">{{ game.get_genre_display }}</span>
+        </div>
+        <p class="text-xs text-gray-400">Visibilité: <span class="font-mono">{{ game.is_public|yesno:"Public,Privé" }}</span></p>
+        <div class="flex gap-2">
+          <a href="{% url 'games:detail' game.id %}" class="px-2 py-1 text-sm rounded bg-gray-800 hover:bg-gray-700">Ouvrir</a>
+          <a href="{% url 'games:toggle_privacy' game.id %}" class="px-2 py-1 text-sm rounded bg-gray-800 hover:bg-gray-700">Toggle Public/Privé</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>Pas encore de jeu. Lancez-vous !</p>
+  {% endfor %}
+</div>
+{% endblock %}

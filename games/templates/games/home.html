@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Jeux publics</h1>
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+  {% for game in games %}
+    <a href="{% url 'games:detail' game.id %}" class="block rounded-lg overflow-hidden border border-white/10 bg-gray-900/50 hover:bg-gray-900/70">
+      {% if game.environment_image_url %}
+        <img src="{{ game.environment_image_url }}" class="w-full h-40 object-cover" alt="env">
+      {% endif %}
+      <div class="p-3">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="font-semibold">{{ game.title }}</h3>
+          <span class="text-xs px-2 py-0.5 rounded bg-white/10">{{ game.get_genre_display }}</span>
+        </div>
+        <p class="text-sm text-gray-400 line-clamp-2">{{ game.ambiance }}</p>
+        <p class="text-xs text-gray-500 mt-2">par {{ game.user.username }} • {{ game.created_at|date:"d/m/Y H:i" }}</p>
+      </div>
+    </a>
+  {% empty %}
+    <p>Aucun jeu public pour l’instant.</p>
+  {% endfor %}
+</div>
+{% endblock %}

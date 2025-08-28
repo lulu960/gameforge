@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Exploration libre</h1>
+<form method="post" class="grid lg:grid-cols-3 gap-6">
+  {% csrf_token %}
+  <div class="lg:col-span-2 space-y-4">
+    <div class="rounded border border-white/10 bg-gray-900/60 overflow-hidden">
+      {% if preview.environment_image_url %}
+        <img src="{{ preview.environment_image_url }}" class="w-full h-56 object-cover" alt="env">
+      {% endif %}
+      <div class="p-4 space-y-2">
+        <h2 class="text-2xl font-semibold">{{ preview.title }}</h2>
+        <p class="text-sm text-gray-400">Genre: {{ preview.genre }} • {{ preview.ambiance }}</p>
+        <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.universe }}</pre>
+        <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.locations }}</pre>
+        <h3 class="text-xl font-semibold mt-3">Scénario</h3>
+        <pre class="whitespace-pre-wrap text-sm text-gray-200">{{ preview.story }}</pre>
+      </div>
+    </div>
+
+    <div class="rounded border border-white/10 bg-gray-900/60 p-4">
+      <h3 class="text-xl font-semibold mb-2">Personnages</h3>
+      <div class="grid md:grid-cols-2 gap-3">
+        {% for ch in preview.characters %}
+        <div class="border border-white/10 rounded p-3 bg-gray-900/60">
+          <div class="font-semibold">{{ ch.name }}</div>
+          <div class="text-xs text-gray-400 mb-1">{{ ch.role }}</div>
+          <p class="text-sm">{{ ch.abilities }}</p>
+          <p class="text-sm text-gray-300">{{ ch.motivation }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <aside class="space-y-4">
+    {% if user.is_authenticated %}
+      <button class="w-full px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Enregistrer dans mon tableau de bord</button>
+    {% else %}
+      <p class="text-sm text-gray-400">Connectez-vous pour sauvegarder cet aperçu.</p>
+      <a href="/accounts/login/" class="block text-center px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 mt-2">Se connecter</a>
+    {% endif %}
+    {% if preview.character_image_url %}
+      <img src="{{ preview.character_image_url }}" class="w-full h-56 object-cover rounded border border-white/10" alt="char">
+    {% endif %}
+  </aside>
+</form>
+{% endblock %}

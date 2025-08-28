@@ -1,0 +1,18 @@
+# Backend web
+Django==5.0.6
+requests>=2.32.3
+python-dotenv>=1.0.1
+
+# Images
+Pillow>=10.4.0
+
+# PyTorch (GPU build CUDA 12.4)
+torch==2.4.0+cu124
+torchvision==0.19.0+cu124
+torchaudio==2.4.0+cu124
+--extra-index-url https://download.pytorch.org/whl/cu124
+
+# HuggingFace / Diffusion
+diffusers>=0.31.0
+transformers>=4.44.2
+huggingface_hub>=0.24.6
