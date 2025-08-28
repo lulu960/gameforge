@@ -186,12 +186,11 @@ def explore_view(request):
             keywords = prompt['keywords']
             references = prompt['references']
 
+
             universe = generate_universe(genre, ambiance, keywords)
             locations = generate_locations(ambiance)
             chars = generate_characters()
-            char_img, env_img = generate_concept_image_urls(genre, ambiance, keywords)
-
-            # Harmonisation des noms dans le scénario
+            # Générer le scénario avant de passer à l'image
             story = generate_story_3_acts(title, genre, ambiance, keywords, references)
             import re
             def replace_names_in_story(story, chars):
@@ -214,6 +213,14 @@ def explore_view(request):
                         replaced_lines.append(new_line)
                 return '\n'.join(replaced_lines)
             story = replace_names_in_story(story, chars)
+            # Générer les images avec tout le contexte
+            char_img, env_img = generate_concept_image_urls(
+                genre, ambiance, keywords,
+                title=title,
+                characters=chars,
+                locations=locations,
+                story=story
+            )
 
             preview = {
                 'title': title, 'genre': genre, 'ambiance': ambiance, 'keywords': keywords, 'references': references,

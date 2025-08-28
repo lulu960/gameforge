@@ -1,3 +1,7 @@
+/* Champs de formulaire en noir */
+input, textarea, select {
+  color: #000 !important;
+}
 /* Spinner loader animation */
 .loader {
   border-top-color: #38a169;

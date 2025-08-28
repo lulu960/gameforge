@@ -98,13 +98,15 @@ def generate_locations(ambiance):
     prompt = f"3 lieux emblématiques ambiance {ambiance}, format liste à puces."
     return chat_completion(prompt, max_tokens=200)
 
-def generate_concept_image_urls(genre, ambiance, keywords):
+def generate_concept_image_urls(genre, ambiance, keywords, title=None, characters=None, locations=None, story=None):
     from django.conf import settings
     media_root = getattr(settings, "MEDIA_ROOT", os.path.join(settings.BASE_DIR,"media"))
     os.makedirs(media_root, exist_ok=True)
     import time
     def save_img(prompt, prefix):
-        data = txt2img(prompt, width=768, height=512)
+        # Tronquer le prompt à 200 caractères pour éviter l'erreur CLIP
+        short_prompt = prompt[:200]
+        data = txt2img(short_prompt, width=768, height=512)
         if not data: return None
         timestamp = int(time.time() * 1000)
         filename = f"{prefix}_{timestamp}.png"
@@ -112,8 +114,24 @@ def generate_concept_image_urls(genre, ambiance, keywords):
         with open(path, "wb") as f:
             f.write(data)
         return settings.MEDIA_URL + filename
-    char_url = save_img(f"Concept art héros {genre}, {ambiance}, {keywords}", "char")
-    env_url = save_img(f"Concept art environnement {genre}, {ambiance}, {keywords}", "env")
+
+    # Prompt personnage enrichi
+    char_prompt = f"Concept art d'un héros pour un jeu intitulé '{title}' ({genre}, ambiance {ambiance}). "
+    if characters and len(characters) > 0:
+        ch = characters[0]
+        char_prompt += f"Nom: {ch['name']}, Rôle: {ch['role']}, Capacités: {ch['abilities']}, Motivation: {ch['motivation']}. "
+    char_prompt += f"Mots-clés: {keywords}. Style cohérent avec l'univers du jeu."
+
+    # Prompt environnement enrichi
+    env_prompt = f"Concept art d'un environnement pour '{title}' ({genre}, ambiance {ambiance}). "
+    if locations:
+        env_prompt += f"Lieux: {locations}. "
+    if story:
+        env_prompt += f"Scénario: {story[:200]}... "
+    env_prompt += f"Mots-clés: {keywords}. Style immersif et cohérent avec le jeu."
+
+    char_url = save_img(char_prompt, "char")
+    env_url = save_img(env_prompt, "env")
     if not char_url or not env_url:
         seed = abs(hash((genre, ambiance, keywords))) % 1000
         return (f"https://picsum.photos/seed/char{seed}/640/360", f"https://picsum.photos/seed/env{seed}/1280/720")
