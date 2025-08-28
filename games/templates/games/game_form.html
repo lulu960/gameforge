@@ -28,6 +28,19 @@
   <div class="flex items-center gap-2">
     {{ form.is_public }} <label>Rendre public</label>
   </div>
-  <button class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Générer avec l'IA (placeholder)</button>
+  <button id="generate-ia-btn" type="submit" class="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-600">Générer avec l'IA</button>
+  <div id="loading-bar" style="display:none;" class="mt-4 flex justify-center">
+  <div class="loader animate-spin ease-linear rounded-full border-8 border-t-8 border-gray-200 h-12 w-12"></div>
+    <span class="ml-3 text-gray-400">Génération en cours...</span>
+  </div>
+<script>
+  document.getElementById('generate-ia-btn').addEventListener('click', function() {
+    document.getElementById('loading-bar').style.display = 'flex';
+    setTimeout(function() {
+      document.getElementById('generate-ia-btn').disabled = true;
+      document.getElementById('generate-ia-btn').classList.add('opacity-50', 'cursor-not-allowed');
+    }, 50);
+  });
+</script>
 </form>
 {% endblock %}
