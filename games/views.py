@@ -70,13 +70,8 @@ def home_view(request):
 
 @login_required
 def dashboard_view(request):
-    # Jeux créés par l'utilisateur
-    created_games = Game.objects.filter(user=request.user)
-    # Jeux favoris (star)
-    favorite_games = Game.objects.filter(favorited_by__user=request.user)
-
-    # Union sans doublons
-    games = (created_games | favorite_games).distinct()
+    # Jeux créés par l'utilisateur uniquement
+    games = Game.objects.filter(user=request.user)
 
     q = request.GET.get('q', '').strip()
     genre = request.GET.get('genre', '').strip()
