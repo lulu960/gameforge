@@ -7,11 +7,9 @@
   <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Rechercher par titre..." class="px-3 py-2 rounded bg-gray-800 text-white" />
   <select name="genre" class="px-3 py-2 rounded bg-gray-800 text-white">
     <option value="">Genre</option>
-    {% if games and games.0 %}
-      {% for key, val in games.0.GENRES %}
-        <option value="{{ key }}" {% if request.GET.genre == key %}selected{% endif %}>{{ val }}</option>
-      {% endfor %}
-    {% endif %}
+    {% for key, val in genres_list %}
+      <option value="{{ key }}" {% if request.GET.genre == key %}selected{% endif %}>{{ val }}</option>
+    {% endfor %}
   </select>
   <input type="date" name="date" value="{{ request.GET.date }}" class="px-3 py-2 rounded bg-gray-800 text-white" />
   <button type="submit" class="px-3 py-2 rounded bg-blue-700 hover:bg-blue-600">Filtrer</button>

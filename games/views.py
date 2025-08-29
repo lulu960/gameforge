@@ -64,11 +64,20 @@ def home_view(request):
     if date:
         games = games.filter(created_at__date=date)
     games = games.order_by('-created_at')
-    return render(request, 'games/home.html', {'games': games, 'request': request})
+    from .models import Game as GameModel
+    genres_list = sorted(GameModel.GENRES, key=lambda x: x[1].lower())
+    return render(request, 'games/home.html', {'games': games, 'request': request, 'genres_list': genres_list})
 
 @login_required
 def dashboard_view(request):
-    games = Game.objects.filter(user=request.user)
+    # Jeux créés par l'utilisateur
+    created_games = Game.objects.filter(user=request.user)
+    # Jeux favoris (star)
+    favorite_games = Game.objects.filter(favorited_by__user=request.user)
+
+    # Union sans doublons
+    games = (created_games | favorite_games).distinct()
+
     q = request.GET.get('q', '').strip()
     genre = request.GET.get('genre', '').strip()
     date = request.GET.get('date', '').strip()
@@ -85,7 +94,10 @@ def dashboard_view(request):
     for game in games:
         is_liked = game.favorited_by.filter(user=request.user).exists()
         games_list.append({'game': game, 'is_liked': is_liked})
-    return render(request, 'games/dashboard.html', {'games_list': games_list, 'request': request})
+
+    from .models import Game as GameModel
+    genres_list = sorted(GameModel.GENRES, key=lambda x: x[1].lower())
+    return render(request, 'games/dashboard.html', {'games_list': games_list, 'request': request, 'genres_list': genres_list})
 
 def _under_daily_limit(user):
     today = timezone.now().date()
